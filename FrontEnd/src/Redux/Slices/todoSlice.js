@@ -1,19 +1,20 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from 'axios';
 
+// todo : extrareducers actions
 export const postTodo = createAsyncThunk("todos/addTodos", async (todo) => {
-    const response = await axios.post("http://localhost:3000/addTask", todo); // Send todo payload
+    const response = await axios.post("http://localhost:3000/addTask", todo);
     console.log("added some response");
-    return response.data; // Return the added todo
+    return response.data;
 });
 
 export const getAllTodos = createAsyncThunk("todos/getTodos", async () => {
     console.log("getting the todos");
     const response = await axios.get("http://localhost:3000/getTask");
-    return response.data; // Return the fetched todos
+    return response.data;
 });
 
-// making the slice
+// todo :: making the slice
 const todoSlice = createSlice({
     name: "asyncTodoList",
     initialState: {
@@ -23,15 +24,18 @@ const todoSlice = createSlice({
     },
     reducers: {
         removeTodo: (state, action) => {
-            const index = action.payload; // Get the index from the action payload
-            state.tasks = state.tasks.filter((_, i) => i !== index); // Filter out the todo
+            const index = action.payload;
+            state.tasks = state.tasks.filter((_, i) => i !== index);
         },
         addTodo: (state, action) => {
-            state.tasks.push(action.payload); // Add the new todo to tasks array
-            state.index += 1; // Increment the index
+            state.tasks.push(action.payload);
+            state.index += 1;
         },
     },
-    extraReducers : (builder) => {
+    // todo :: these are for async actions
+    // * their counterParts are defined in the reducers 
+    extraReducers: (builder) => {
+        // * action.payload, action.error are predefined
         builder
             .addCase(getAllTodos.pending, (state) => {
                 state.loading = true;
@@ -41,22 +45,22 @@ const todoSlice = createSlice({
                 state.tasks = action.payload;
             })
             .addCase(getAllTodos.rejected, (state, action) => {
-                state.loading = false; // Set loading to false on error
-                state.error = action.error.message; // Capture the error message
+                state.loading = false;
+                state.error = action.error.message;
             })
             .addCase(postTodo.pending, (state) => {
                 state.loading = true;
             })
             .addCase(postTodo.fulfilled, (state, action) => {
                 state.loading = false;
-                state.tasks.push(action.payload); // Add the newly created todo
+                state.tasks.push(action.payload);
             })
             .addCase(postTodo.rejected, (state, action) => {
-                state.loading = false; // Set loading to false on error
-                state.error = action.error.message; // Capture the error message
+                state.loading = false;
+                state.error = action.error.message;
             });
     }
 });
 
-export const { removeTodo, addTodo } = todoSlice.actions; // Removed addTodo and getTodo actions
+export const { removeTodo, addTodo } = todoSlice.actions;
 export default todoSlice.reducer;

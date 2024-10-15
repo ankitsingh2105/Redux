@@ -1,53 +1,52 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllTodos, postTodo, addTodo } from './Slices/todoSlice'; // Adjusted import for postTodo
-import { removeTodo } from './Slices/todoSlice';
+import { getAllTodos, postTodo, addTodo, removeTodo } from './Slices/todoSlice';
 
 const Todo = () => {
     const dispatch = useDispatch();
     const todo = useSelector((state) => state.todoList);
-    const { tasks, error, loading } = todo; // Removed index as it's unused
+    const { tasks, error, loading } = todo;
     const [taskString, setTaskString] = useState("");
 
     useEffect(() => {
-        // Fetch all todos when component mounts
         dispatch(getAllTodos());
-    }, [dispatch]); // Adding dispatch to the dependency array
+    }, [dispatch]);
 
     const handleAdd = async () => {
-        if (!taskString) return; // Prevent adding empty tasks
+        if (!taskString) return;
         try {
             dispatch(addTodo({ task: taskString }));
-            await dispatch(postTodo({ task: taskString })).unwrap(); // Send the new todo
-            setTaskString(""); // Clear input after successful addition
+            await dispatch(postTodo({ task: taskString })).unwrap();
+            setTaskString("");
         } catch (error) {
             console.error("Failed to add todo: ", error);
         }
     };
-    
+
 
     return (
         <>
             <center>
-                <input 
-                    value={taskString} // Controlled input
-                    onChange={(e) => setTaskString(e.target.value)} 
-                    type="text" 
+                <input
+                    value={taskString}
+                    onChange={(e) => setTaskString(e.target.value)}
+                    type="text"
                 />
                 <br />
                 <br />
                 <button onClick={handleAdd}>Add Todo</button>
             </center>
-            <ul>
+            <br />
+            <div>
                 {loading ? (
                     <div>Loading...</div>
                 ) : (
                     tasks.map((task, i) => (
-                        <div key={i}>{task.task}</div>
+                        <center key={i}>{task.task}</center>
                     ))
                 )}
-                {error && <div>Error: {error}</div>} {/* Display error if it exists */}
-            </ul>
+                {error && <div>Error: {error}</div>}
+            </div>
         </>
     );
 };
